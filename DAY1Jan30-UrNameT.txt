@@ -72,7 +72,7 @@ config t
 Interface Range Fa0/10-12
 switchport trunk encapsulation Dot1Q
 switchport mode trunk
-switchport trunk allowed vlan1,10,50,100,999
+switchport trunk allowed vlan 1,10,50,100,999
 !Enable LinkAggregationCP etherchannel
 Channel-group 10 mode active
 channel-protocol lacp
