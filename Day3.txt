@@ -1,0 +1,145 @@
+CCNP Enterprise:
+
+Minimum Skills:
+ServerSide. 1.ADS (ldap) 2. x.500 CertificateServiceAuthority
+3. DHCP 4. NetworkPolciyServer: radius, 802.1x authentication.
+
+
+Task1: Radius Authentication for Switches/VoiceGateway
+Authentication, Authorization, Accounting
+Taas/Baba:
+config t
+aaa new-model
+username admin password pass
+radius-server host 10.31.1.8 key secret123
+ip radius source-interface vlan 1
+aaa authorization exec default group radius
+aaa authentication login default group radius local
+line vty 0 14
+  login authentication default
+end
+
+
+Task2: BALIK CCNA:
+config t
+no aaa new-model
+no radius-server host 10.31.1.8 key secret123
+config t
+line vty 0 14
+ no login
+ login
+
+Task3: DEPLOYING CSICO 802.1X port based authentication using windows certification:
+config t
+aaa new-model
+aaa authentication dot1x default group radius
+aaa authorization network default group radius
+aaa accounting dot1x default start-stop group radius
+dot1x system-auth-control
+radius-server host 10.31.1.8 auth-port 1812 acct-port 1813 key secret123
+int fa0/3
+  switchport mode access
+  authentication port-control auto
+  dot1x port-control auto
+  spanning-tree portfast
+end
+
+
+
+Task4: Newer/IOX/linux 802.1x
+CoreTAAS
+
+conf t
+no aaa new-model
+aaa new-model
+dot1x system-auth-control
+radius-server host 10.31.1.8 auth-port 1812 acct-port 1813 key secret123
+aaa authentication dot1x default group radius
+aaa authorization network default group radius
+aaa accounting dot1x default start-stop group radius
+int fa0/5
+  switchport mode access
+  authentication port-control auto
+  dot1x pae authenticator
+  spanning-tree portfast
+
+
+Task5: CCNP Encor Skill no.5 Learn Nexus vs. Catalyst.
+$$$$$$$$$$$$$$$bawal copy/paste$$$$$$$$$$$$$$$$$$$$$$
+VXLAN = vlan for datacenter: eastwest
+
+show feature
+conf t
+feature ospf
+feature nv overlay
+feature vn-segment-vlan-based
+system jumbomtu 9216
+end
+copy run start
+
+#REALWORLD VXLAN config DCJP:
+
+
+
+Task6: LISP for IP cameras, IOT, 
+R1,2,3:
+conf t
+no logg cons
+line vty 0 14
+exec-timeout 0 0
+int gi 1
+ip add 192.168.101.11,12,13 255.255.255.0
+no sh
+
+
+Task7: Configure VPN
+H - Hashing - SHA 256
+E - Encryption - AES 256
+P - Protocol - ESP - Encapsulating Security Payload
+A - Authentication - PSK - Pre-Shared Key
+
+@R1
+en
+conf t
+int gi 2
+ip add 192.168.102.10 255.255.255.0
+no shut
+
+@R2
+en
+conf t
+ip add 192.168.102.20 255.255.255.0
+no shut
+
+
+@R1 Site 1
+config t
+no logging console
+no ip domain lookup
+ip route 0.0.0.0 0.0.0.0 200.0.0.20
+int gi 1
+ip add 200.0.0.10 255.255.255.0
+no shut
+int gi 3
+ip add 10.10.10.1 255.255.255.0
+no shut
+
+@R2 Site 2
+config t
+no logging console
+no ip domain lookup
+ip route 0.0.0.0 0.0.0.0 200.0.0.10
+int gi 1
+ip add 200.0.0.20 255.255.255.0
+no shut
+int gi 3
+ip add 10.20.20.1 255.255.255.0
+no shut
+
+BRANCH1
+sudo ifconfig eth0 10.10.10.10 netmask 255.255.255.0 up
+sudo route add default gw 10.10.10.1
+
+BRANCH2
+sudo ifconfig eth0 10.20.20.20 netmask 255.255.255.0 up
+sudo route add default gw 10.20.20.1

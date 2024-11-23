@@ -1,0 +1,94 @@
+@cloud
+
+en
+conf t
+hostname cloud
+int lo 0
+ip add 8.8.8.8 255.255.255.255
+ex
+
+int vlan 1
+no shut
+ip add 100.0.0.254 255.255.255.0
+router bgp 65001
+no synchro
+bgp log-neighbor-changes
+network 8.8.8.8 mask 255.255.255.255
+network 100.0.0.0 mask 255.255.255.0
+neighbor 100.0.0.107 remote-as 65001
+neighbor 100.0.0.109 remote-as 65001
+neighbor 100.0.0.111 remote-as 65001
+no auto-summary
+end
+wr
+
+
+@SITE1
+en
+conf t
+hostname site1
+no ip domain-lookup
+int f0/0
+no shut
+ip add 172.16.10.2 255.255.255.0
+ex
+int lo 0
+no shut
+ip add 1.1.1.1 255.255.255.255
+end
+wr
+
+conf t
+router ospf 1
+network 172.16.10.0 0.0.0.255 area 0
+network 1.1.1.1 0.0.0.0 area 0
+end
+wr
+
+
+@SITE2
+en
+conf t
+hostname site2
+no ip domain-lookup
+int f0/0
+no shut
+ip add 172.16.20.2 255.255.255.0
+ex
+int lo 0
+no shut
+ip add 2.2.2.2 255.255.255.255
+end
+wr
+
+
+conf t
+router ospf 1
+network 172.16.20.0 0.0.0.255 area 0
+network 2.2.2.2 0.0.0.0 area 0
+end
+wr
+
+
+@SITE3
+en
+conf t
+hostname site3
+no ip domain-lookup
+int f0/0
+no shut
+ip add 172.16.30.2 255.255.255.0
+ex
+int lo 0
+no shut
+ip add 3.3.3.3 255.255.255.255
+end
+wr
+
+
+conf t
+router ospf 1
+network 172.16.30.0 0.0.0.255 area 0
+network 3.3.3.3 0.0.0.0 area 0
+end
+wr

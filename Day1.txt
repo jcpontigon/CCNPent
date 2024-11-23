@@ -1,0 +1,123 @@
+config t
+mls qos
+mls qos map dscp
+
+
+QoSConfigure: improve voip:
+how? : "cm - pm - sp:"
+classMap -> policyMap -> servicePolicy:
+config t
+class-map match-any VOICE
+ match ip dscp ef
+ match protocol rtp audio
+Policy-map QoS-VOIP
+ class VOICE
+   priority 10000
+   set dscp ef
+ class class-default
+   fair-queue
+ int fa 0/0
+  service-policy output Q0S-VOIP
+end
+
+
+VIRTUALIZATION: the king is dead: vmware
+
+
+@D1:
+config t
+int range e0/1,e0/2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 1-99
+ channel-group 10 mode active
+ channel-protocol lacp
+int range e0/0,e0/3
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 1-99
+ channel-group 20 mode active
+ channel-protocol lacp
+int range e1/2,e1/3
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 1-99
+ channel-group 30 mode active
+ channel-protocol lacp
+
+
+@D2:
+config t
+int range e0/1,e0/2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 1-99
+ channel-group 15 mode active
+ channel-protocol lacp
+int range e0/0,e0/3
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 1-99
+ channel-group 25 mode active
+ channel-protocol lacp
+int range e1/2,e1/3
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 1-99
+ channel-group 30 mode active
+ channel-protocol lacp
+
+@A1:
+config t
+int range e0/1,e0/2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 1-99
+ channel-group 10 mode active
+ channel-protocol lacp
+int range e1/0,e0/3
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 1-99
+ channel-group 15 mode active
+ channel-protocol lacp
+
+@A2:
+config t
+int range e0/0,e0/3
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 1-99
+ channel-group 25 mode active
+ channel-protocol lacp
+int range e0/2,e0/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan 1-99
+ channel-group 20 mode active
+ channel-protocol lacp
+
+D1&D2:
+conf t
+vtp domain ccnp
+vtp password encor
+vtp mode server
+exit
+
+A1&A2:
+conf t
+vtp domain ccnp
+vtp password encor
+vtp mode client
+exit
+
+
+D1: gawa vlan:
+config t
+vlan 10
+name ENDPOINT
+vlan 20
+name SERVERS
+vlan 200
+name DMZ
+exit
